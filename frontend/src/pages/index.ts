@@ -1,0 +1,9 @@
+export { default as Login } from './Login';
+export { default as Register } from './Register';
+export { default as Dashboard } from './Dashboard';
+export { default as Interviews } from './Interviews';
+export { default as Calendar } from './Calendar';
+export { default as Analytics } from './Analytics';
+export { default as Candidates } from './Candidates';
+export { default as Settings } from './Settings';
+export { default as NotFound } from './NotFound';
