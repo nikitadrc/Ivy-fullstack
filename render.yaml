@@ -6,10 +6,7 @@ services:
     staticPublishPath: ./frontend/dist
     envVars:
       - key: VITE_API_URL
-        fromService:
-          name: ai-interview-chatbot-backend
-          type: web
-          property: url
+        value: https://ai-interview-chatbot-backend.onrender.com
 
   - type: web
     name: ai-interview-chatbot-backend
@@ -27,6 +24,8 @@ services:
         sync: false
       - key: JWT_SECRET
         generateValue: true
+      - key: CORS_ORIGINS
+        value: https://ai-interview-chatbot-frontend.onrender.com
 
 databases:
   - name: interview-db
