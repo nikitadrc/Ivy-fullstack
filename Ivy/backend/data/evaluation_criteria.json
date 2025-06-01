@@ -1,0 +1,54 @@
+{
+  "technical": {
+    "understanding": {
+      "weight": 0.3,
+      "criteria": [
+        "Demonstrates clear understanding of core concepts",
+        "Explains technical terms accurately",
+        "Shows depth of knowledge"
+      ]
+    },
+    "implementation": {
+      "weight": 0.4,
+      "criteria": [
+        "Provides practical examples",
+        "Discusses real-world applications",
+        "Considers edge cases and limitations"
+      ]
+    },
+    "communication": {
+      "weight": 0.3,
+      "criteria": [
+        "Explains concepts clearly",
+        "Uses appropriate technical terminology",
+        "Structures answer logically"
+      ]
+    }
+  },
+  "behavioral": {
+    "situation": {
+      "weight": 0.25,
+      "criteria": [
+        "Clearly describes the context",
+        "Identifies the challenge",
+        "Explains stakeholders involved"
+      ]
+    },
+    "action": {
+      "weight": 0.5,
+      "criteria": [
+        "Details specific actions taken",
+        "Shows initiative and ownership",
+        "Demonstrates problem-solving approach"
+      ]
+    },
+    "result": {
+      "weight": 0.25,
+      "criteria": [
+        "Quantifies outcomes where possible",
+        "Reflects on lessons learned",
+        "Discusses impact on team/project"
+      ]
+    }
+  }
+} 

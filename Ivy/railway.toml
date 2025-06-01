@@ -1,0 +1,14 @@
+[build]
+builder = "NIXPACKS"
+buildCommand = "pip install -r backend/requirements.txt"
+
+[deploy]
+startCommand = "python -m uvicorn main:app --host 0.0.0.0 --port $PORT"
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3
+
+[variables]
+PYTHON_VERSION = "3.9.0"
+# Railway will automatically inject the DATABASE_URL for PostgreSQL
+ENVIRONMENT = "production"
+ALLOWED_ORIGINS = "*"  # Update this with your frontend URL when deployed 
