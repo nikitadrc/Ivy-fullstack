@@ -1,179 +1,143 @@
-# AI Interview Chatbot
+# AI Interview Preparation Chatbot
 
-An intelligent chatbot platform for conducting automated technical interviews, powered by AI.
+An intelligent chatbot powered by LangChain and RAG (Retrieval-Augmented Generation) to help users prepare for technical interviews across various roles.
 
-## Features
+## Core Features
 
-- User authentication and authorization
-- Interview scheduling and management
-- Real-time chat interface with AI interviewer
-- File upload and management
-- Calendar integration (Google Calendar)
-- Email notifications (SendGrid)
-- File storage (AWS S3)
+### 1. Role-Based Interview Preparation
+- Choose from multiple engineering roles:
+  - Frontend Engineer
+  - Backend Engineer
+  - Full-stack Engineer
+  - Data Scientist / Analyst
+  - DevOps Engineer
+  - AI/ML Engineer
+  - QA/Testing Engineer
+
+### 2. RAG-Powered Q&A Engine
+- Utilizes LangChain and FAISS for intelligent answer retrieval
+- Sources answers from:
+  - Technical interview guides
+  - Job descriptions
+  - Coding platforms content
+  - Role-specific documentation
+
+### 3. Question Type Support
+- Technical Theory Questions
+- Coding Problems
+- Behavioral Questions
+- System Design Challenges
+- Resume-Based Questions
+
+### 4. Progress Tracking
+- Topic-wise progress monitoring
+- Study streak tracking
+- Personalized topic recommendations
+- Visual progress indicators
+
+### 5. Interactive Features
+- Real-time feedback collection
+- Answer quality ratings
+- Helpful/Not helpful indicators
+- Comment submission
 
 ## Tech Stack
 
 ### Backend
-- FastAPI (Python web framework)
-- PostgreSQL (Database)
-- Redis (Caching and session management)
-- SQLAlchemy (ORM)
-- Alembic (Database migrations)
-- pytest (Testing)
+- FastAPI
+- SQLAlchemy
+- LangChain
+- FAISS Vector Store
+- PostgreSQL
 
 ### Frontend
-- React with TypeScript
-- Material-UI components
-- React Query for API integration
-- Jest and React Testing Library
-- WebSocket for real-time chat
+- React
+- TypeScript
+- Material-UI
+- React Query
 
-### Infrastructure
-- Docker and Docker Compose
-- GitHub Actions (CI/CD)
-- AWS S3 for file storage
-- Nginx as reverse proxy
-
-## Getting Started
-
-### Prerequisites
-
-- Python 3.8+
-- Node.js 16+
-- Docker and Docker Compose
-- PostgreSQL 13+
-- Redis
-
-### Environment Setup
+## Setup Instructions
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/ai-interview-chatbot.git
+git clone <repository-url>
 cd ai-interview-chatbot
 ```
 
-2. Create and activate a virtual environment:
+2. Set up the Python environment:
 ```bash
 python -m venv venv
 source venv/bin/activate  # On Windows: .\venv\Scripts\activate
-```
-
-3. Install backend dependencies:
-```bash
 pip install -r requirements.txt
 ```
 
-4. Install frontend dependencies:
+3. Set up environment variables:
+```bash
+cp .env.example .env
+# Edit .env with your configuration
+```
+
+4. Initialize the database:
+```bash
+alembic upgrade head
+```
+
+5. Install frontend dependencies:
 ```bash
 cd frontend
 npm install
 ```
 
-5. Set up environment variables:
-```bash
-# Backend (.env)
-DB_USER=postgres
-DB_PASSWORD=your_password
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=interview_bot
-JWT_SECRET=your_secret_key
-GOOGLE_CLIENT_ID=your_google_client_id
-GOOGLE_CLIENT_SECRET=your_google_client_secret
-SENDGRID_API_KEY=your_sendgrid_key
-AWS_ACCESS_KEY_ID=your_aws_key
-AWS_SECRET_ACCESS_KEY=your_aws_secret
-AWS_BUCKET_NAME=your_bucket_name
+6. Start the development servers:
 
-# Frontend (.env.local)
-REACT_APP_API_URL=http://localhost:8000
-REACT_APP_WS_URL=ws://localhost:8000
+Backend:
+```bash
+uvicorn src.main:app --reload
 ```
 
-### Database Setup
-
-1. Create the database:
+Frontend:
 ```bash
-createdb interview_bot
+npm run dev
 ```
 
-2. Run database migrations:
-```bash
-alembic upgrade head
+## Environment Variables
+
+```env
+DATABASE_URL=postgresql://user:password@localhost:5432/dbname
+SECRET_KEY=your-secret-key
+OPENAI_API_KEY=your-openai-api-key
 ```
 
-### Running the Application
+## Project Structure
 
-#### Using Docker Compose (Recommended)
-
-```bash
-docker-compose up --build
 ```
-
-The application will be available at:
-- Frontend: http://localhost:3000
-- Backend API: http://localhost:8000
-- API Documentation: http://localhost:8000/api/docs
-
-#### Manual Development Setup
-
-1. Start the backend server:
-```bash
-uvicorn src.main:app --reload --port 8000
+.
+├── src/
+│   ├── main.py
+│   ├── models.py
+│   ├── schemas.py
+│   └── services/
+│       ├── rag_service.py
+│       └── progress_service.py
+├── frontend/
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── RoleSelector.tsx
+│   │   │   ├── ProgressTracker.tsx
+│   │   │   └── FeedbackDialog.tsx
+│   │   └── App.tsx
+│   └── package.json
+├── data/
+│   ├── frontend/
+│   ├── backend/
+│   ├── fullstack/
+│   ├── data_science/
+│   ├── devops/
+│   ├── ai_ml/
+│   └── qa/
+├── requirements.txt
+└── README.md
 ```
-
-2. Start the frontend development server:
-```bash
-cd frontend
-npm start
-```
-
-## Testing
-
-### Backend Tests
-
-```bash
-# Run all tests
-pytest
-
-# Run with coverage report
-pytest --cov=src tests/
-```
-
-### Frontend Tests
-
-```bash
-cd frontend
-npm test
-
-# Run with coverage
-npm test -- --coverage
-```
-
-## API Documentation
-
-The API documentation is available at:
-- Swagger UI: http://localhost:8000/api/docs
-- ReDoc: http://localhost:8000/api/redoc
-
-## Deployment
-
-### Production Setup
-
-1. Update the production configurations in `docker-compose.prod.yml`
-2. Set up SSL certificates
-3. Configure environment variables for production
-4. Deploy using Docker Compose:
-```bash
-docker-compose -f docker-compose.prod.yml up -d
-```
-
-### Monitoring and Logging
-
-- Application logs are available in Docker logs
-- Monitoring is set up using Prometheus and Grafana
-- Error tracking is configured with Sentry
 
 ## Contributing
 
@@ -185,16 +149,4 @@ docker-compose -f docker-compose.prod.yml up -d
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Security
-
-- All endpoints are protected with JWT authentication
-- Passwords are hashed using bcrypt
-- API keys and secrets are stored in environment variables
-- CORS is configured for security
-- Rate limiting is implemented on sensitive endpoints
-
-## Support
-
-For support, please open an issue in the GitHub repository or contact the maintainers. 
+MIT License - see LICENSE file for details 

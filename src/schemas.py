@@ -1,6 +1,7 @@
 from pydantic import BaseModel, EmailStr, validator
-from typing import Optional, List
+from typing import Optional, List, Dict, Any
 from datetime import datetime
+from models import RoleType, QuestionType
 
 # Token schemas
 class Token(BaseModel):
@@ -13,23 +14,18 @@ class TokenData(BaseModel):
 # User schemas
 class UserBase(BaseModel):
     email: EmailStr
-    name: str
-    role: str
-
-    @validator('role')
-    def validate_role(cls, v):
-        if v not in ['candidate', 'interviewer', 'admin']:
-            raise ValueError('Invalid role')
-        return v
+    selected_role: Optional[RoleType] = None
 
 class UserCreate(UserBase):
     password: str
 
-class UserResponse(UserBase):
-    id: int
-    is_active: bool
-    created_at: datetime
+class UserUpdate(UserBase):
+    password: Optional[str] = None
 
+class User(UserBase):
+    id: int
+    created_at: datetime
+    
     class Config:
         orm_mode = True
 
@@ -131,11 +127,60 @@ class FileResponse(FileBase):
 
 # Composite schemas
 class InterviewDetailResponse(InterviewResponse):
-    candidate: UserResponse
-    interviewer: UserResponse
+    candidate: User
+    interviewer: User
     questions: List[QuestionResponse]
     responses: List[ResponseResponse]
     files: List[FileResponse]
 
     class Config:
-        orm_mode = True 
+        orm_mode = True
+
+class ChatSessionBase(BaseModel):
+    question_type: QuestionType
+    chat_history: List[Dict[str, Any]]
+
+class ChatSessionCreate(ChatSessionBase):
+    user_id: int
+
+class ChatSession(ChatSessionBase):
+    id: int
+    created_at: datetime
+    
+    class Config:
+        orm_mode = True
+
+class ProgressTrackBase(BaseModel):
+    topic: str
+    progress_percentage: float
+
+class ProgressTrackCreate(ProgressTrackBase):
+    user_id: int
+
+class ProgressTrack(ProgressTrackBase):
+    id: int
+    last_updated: datetime
+    
+    class Config:
+        orm_mode = True
+
+class FeedbackBase(BaseModel):
+    rating: int  # 1-5 stars
+    was_helpful: bool
+    comment: Optional[str] = None
+
+class FeedbackCreate(FeedbackBase):
+    chat_session_id: int
+
+class Feedback(FeedbackBase):
+    id: int
+    created_at: datetime
+    
+    class Config:
+        orm_mode = True
+
+class ChatResponse(BaseModel):
+    answer: str
+    context_used: Optional[List[str]] = None
+    confidence_score: Optional[float] = None
+    suggested_topics: Optional[List[str]] = None 

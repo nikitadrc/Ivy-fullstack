@@ -1,0 +1,67 @@
+{
+  "frontend": {
+    "beginner": [
+      {
+        "id": "fe_b_1",
+        "question": "What is React's virtual DOM?",
+        "topic": "React",
+        "type": "technical",
+        "expected_duration": 5
+      },
+      {
+        "id": "fe_b_2",
+        "question": "Explain the difference between var, let, and const in JavaScript.",
+        "topic": "JavaScript",
+        "type": "technical",
+        "expected_duration": 5
+      }
+    ],
+    "intermediate": [
+      {
+        "id": "fe_i_1",
+        "question": "How does React's useEffect hook work? What are the common use cases?",
+        "topic": "React",
+        "type": "technical",
+        "expected_duration": 8
+      }
+    ],
+    "advanced": [
+      {
+        "id": "fe_a_1",
+        "question": "Explain React's Fiber architecture and its benefits.",
+        "topic": "React",
+        "type": "technical",
+        "expected_duration": 10
+      }
+    ]
+  },
+  "backend": {
+    "beginner": [
+      {
+        "id": "be_b_1",
+        "question": "What is the difference between SQL and NoSQL databases?",
+        "topic": "Databases",
+        "type": "technical",
+        "expected_duration": 5
+      }
+    ],
+    "intermediate": [
+      {
+        "id": "be_i_1",
+        "question": "Explain the concept of database indexing and its importance.",
+        "topic": "Databases",
+        "type": "technical",
+        "expected_duration": 8
+      }
+    ],
+    "advanced": [
+      {
+        "id": "be_a_1",
+        "question": "How would you design a distributed caching system?",
+        "topic": "System Design",
+        "type": "technical",
+        "expected_duration": 15
+      }
+    ]
+  }
+} 

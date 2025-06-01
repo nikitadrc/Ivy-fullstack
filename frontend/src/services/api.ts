@@ -8,6 +8,8 @@ import {
   InterviewCreate,
   InterviewUpdate,
 } from '../types/api';
+import { Role } from '../components/RoleSelector';
+import { QuestionType } from '../types/chat';
 
 // Create axios instance with default config
 const api: AxiosInstance = axios.create({
@@ -96,6 +98,74 @@ export const files = {
     });
     return response.data;
   },
+};
+
+// Role API
+export const setUserRole = async (userId: number, role: Role) => {
+  const response = await api.post(`/users/${userId}/role`, { role });
+  return response.data;
+};
+
+// Chat API
+export interface ChatMessage {
+  role: 'user' | 'assistant';
+  content: string;
+}
+
+export interface ChatRequest {
+  question_type: QuestionType;
+  chat_history: ChatMessage[];
+}
+
+export interface ChatResponse {
+  answer: string;
+  context_used: string[];
+  confidence_score: number;
+  suggested_topics: string[];
+}
+
+export const sendChatMessage = async (
+  userId: number,
+  request: ChatRequest
+): Promise<ChatResponse> => {
+  const response = await api.post(`/chat/${userId}`, request);
+  return response.data;
+};
+
+// Feedback API
+export interface Feedback {
+  rating: number;
+  wasHelpful: boolean;
+  comment: string;
+}
+
+export const submitFeedback = async (
+  chatSessionId: number,
+  feedback: Feedback
+) => {
+  const response = await api.post(`/chat/${chatSessionId}/feedback`, feedback);
+  return response.data;
+};
+
+// Progress API
+export const getUserProgress = async (userId: number) => {
+  const response = await api.get(`/users/${userId}/progress`);
+  return response.data;
+};
+
+export const getRecommendations = async (
+  userId: number,
+  limit: number = 3
+) => {
+  const response = await api.get(`/users/${userId}/recommendations`, {
+    params: { limit }
+  });
+  return response.data;
+};
+
+export const getStudyStreak = async (userId: number) => {
+  const response = await api.get(`/users/${userId}/streak`);
+  return response.data;
 };
 
 export default api;

@@ -3,7 +3,7 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 import jwt
 from jwt.exceptions import PyJWTError
 from passlib.context import CryptContext
@@ -21,6 +21,8 @@ from .services.calendar_service import CalendarService
 from .services.email_service import EmailService
 from .services.storage_service import StorageService
 from .services.auth import create_access_token, get_current_user
+from .services.rag_service import RAGService
+from .services.progress_service import ProgressService
 
 # Load environment variables
 load_dotenv()
@@ -67,6 +69,8 @@ ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "30")
 calendar_service = CalendarService()
 email_service = EmailService()
 storage_service = StorageService()
+rag_service = RAGService()
+progress_service = ProgressService()
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
@@ -335,6 +339,130 @@ async def interview_websocket(
     Establishes a WebSocket connection for real-time communication during the interview.
     """
     # ... existing implementation ...
+
+@app.post("/users/{user_id}/role", response_model=User)
+def set_user_role(
+    user_id: int,
+    role: RoleType,
+    db: Session = Depends(get_db)
+):
+    """Set or update the user's selected role"""
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    user.selected_role = role
+    db.commit()
+    db.refresh(user)
+    return user
+
+@app.post("/chat/{user_id}", response_model=ChatResponse)
+async def process_chat(
+    user_id: int,
+    chat_request: ChatSessionCreate,
+    db: Session = Depends(get_db)
+):
+    """Process a chat message and return response"""
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    if not user.selected_role:
+        raise HTTPException(
+            status_code=400,
+            detail="Please select a role before starting chat"
+        )
+    
+    # Create new chat session
+    chat_session = ChatSession(
+        user_id=user_id,
+        question_type=chat_request.question_type,
+        chat_history=chat_request.chat_history
+    )
+    db.add(chat_session)
+    db.commit()
+    db.refresh(chat_session)
+    
+    # Process the question
+    response = rag_service.process_question(
+        question=chat_request.chat_history[-1]["content"],
+        role=user.selected_role,
+        question_type=chat_request.question_type,
+        chat_history=chat_request.chat_history[:-1]
+    )
+    
+    # Update progress
+    progress_service = ProgressService(db)
+    progress_service.update_progress(
+        user_id=user_id,
+        topic=chat_request.question_type.value
+    )
+    
+    return response
+
+@app.get("/users/{user_id}/progress", response_model=Dict[str, float])
+def get_progress(
+    user_id: int,
+    db: Session = Depends(get_db)
+):
+    """Get user's progress across all topics"""
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    progress_service = ProgressService(db)
+    return progress_service.get_user_progress(user_id)
+
+@app.get("/users/{user_id}/recommendations", response_model=List[Dict[str, Any]])
+def get_recommendations(
+    user_id: int,
+    limit: int = 3,
+    db: Session = Depends(get_db)
+):
+    """Get recommended topics for the user"""
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    progress_service = ProgressService(db)
+    return progress_service.get_recommended_topics(user_id, limit)
+
+@app.get("/users/{user_id}/streak", response_model=int)
+def get_study_streak(
+    user_id: int,
+    db: Session = Depends(get_db)
+):
+    """Get user's current study streak"""
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    progress_service = ProgressService(db)
+    return progress_service.get_study_streak(user_id)
+
+@app.post("/chat/{chat_session_id}/feedback", response_model=Feedback)
+def submit_feedback(
+    chat_session_id: int,
+    feedback: FeedbackCreate,
+    db: Session = Depends(get_db)
+):
+    """Submit feedback for a chat session"""
+    chat_session = db.query(ChatSession).filter(
+        ChatSession.id == chat_session_id
+    ).first()
+    if not chat_session:
+        raise HTTPException(status_code=404, detail="Chat session not found")
+    
+    new_feedback = Feedback(
+        chat_session_id=chat_session_id,
+        rating=feedback.rating,
+        was_helpful=feedback.was_helpful,
+        comment=feedback.comment
+    )
+    db.add(new_feedback)
+    db.commit()
+    db.refresh(new_feedback)
+    return new_feedback
 
 if __name__ == "__main__":
     import uvicorn

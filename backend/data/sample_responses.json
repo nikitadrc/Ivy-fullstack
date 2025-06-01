@@ -1,0 +1,32 @@
+{
+  "fe_b_1": {
+    "question_id": "fe_b_1",
+    "sample_responses": [
+      {
+        "response": "The Virtual DOM is a programming concept where an ideal, or 'virtual', representation of a UI is kept in memory and synced with the 'real' DOM by a library such as ReactDOM. This process is called reconciliation. The Virtual DOM works in three simple steps: 1) When data changes, the entire UI is re-rendered in Virtual DOM representation. 2) The difference between the previous DOM representation and the new one is calculated. 3) The real DOM is updated with what has actually changed. This is more efficient than directly manipulating the DOM.",
+        "evaluation": {
+          "understanding": 0.9,
+          "implementation": 0.85,
+          "communication": 0.95,
+          "overall_score": 0.90,
+          "feedback": "Excellent explanation with clear steps and benefits. Could include more specific examples of performance improvements."
+        }
+      }
+    ]
+  },
+  "be_b_1": {
+    "question_id": "be_b_1",
+    "sample_responses": [
+      {
+        "response": "SQL and NoSQL databases differ in several key aspects. SQL databases are relational, use structured schemas, and follow ACID properties. They're great for complex queries and transactions. Examples include MySQL and PostgreSQL. NoSQL databases are non-relational, have flexible schemas, and scale horizontally more easily. They're better for handling large volumes of unstructured data. Examples include MongoDB and Cassandra. The choice between them depends on your specific use case, data structure, and scaling needs.",
+        "evaluation": {
+          "understanding": 0.95,
+          "implementation": 0.9,
+          "communication": 0.85,
+          "overall_score": 0.90,
+          "feedback": "Strong technical understanding with good examples. Could elaborate more on specific use cases."
+        }
+      }
+    ]
+  }
+} 

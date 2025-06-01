@@ -1,7 +1,24 @@
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Boolean, Text
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Boolean, Text, Float, JSON, Enum
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from .database import Base
+import enum
+
+class RoleType(enum.Enum):
+    FRONTEND = "frontend"
+    BACKEND = "backend"
+    FULLSTACK = "fullstack"
+    DATA_SCIENTIST = "data_scientist"
+    DEVOPS = "devops"
+    AI_ML = "ai_ml"
+    QA = "qa"
+
+class QuestionType(enum.Enum):
+    TECHNICAL = "technical"
+    CODING = "coding"
+    BEHAVIORAL = "behavioral"
+    SYSTEM_DESIGN = "system_design"
+    RESUME = "resume"
 
 class User(Base):
     __tablename__ = "users"
@@ -10,7 +27,7 @@ class User(Base):
     email = Column(String, unique=True, index=True)
     name = Column(String)
     hashed_password = Column(String)
-    role = Column(String)  # candidate, interviewer, admin
+    selected_role = Column(Enum(RoleType))
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
@@ -26,6 +43,8 @@ class User(Base):
         back_populates="interviewer",
         foreign_keys="Interview.interviewer_id"
     )
+    chat_sessions = relationship("ChatSession", back_populates="user")
+    progress_tracks = relationship("ProgressTrack", back_populates="user")
 
 class Interview(Base):
     __tablename__ = "interviews"
@@ -64,7 +83,7 @@ class InterviewQuestion(Base):
     id = Column(Integer, primary_key=True, index=True)
     interview_id = Column(Integer, ForeignKey("interviews.id"))
     question_text = Column(Text)
-    question_type = Column(String)  # technical, behavioral, etc.
+    question_type = Column(Enum(QuestionType))
     order = Column(Integer)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
@@ -101,4 +120,39 @@ class File(Base):
 
     # Relationships
     user = relationship("User")
-    interview = relationship("Interview") 
+    interview = relationship("Interview")
+
+class ChatSession(Base):
+    __tablename__ = "chat_sessions"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    question_type = Column(Enum(QuestionType))
+    chat_history = Column(JSON)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    
+    user = relationship("User", back_populates="chat_sessions")
+    feedback = relationship("Feedback", back_populates="chat_session")
+
+class ProgressTrack(Base):
+    __tablename__ = "progress_tracks"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    topic = Column(String)
+    progress_percentage = Column(Float)
+    last_updated = Column(DateTime(timezone=True), server_default=func.now())
+    
+    user = relationship("User", back_populates="progress_tracks")
+
+class Feedback(Base):
+    __tablename__ = "feedbacks"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    chat_session_id = Column(Integer, ForeignKey("chat_sessions.id"))
+    rating = Column(Integer)  # 1-5 stars
+    was_helpful = Column(Boolean)
+    comment = Column(String, nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    
+    chat_session = relationship("ChatSession", back_populates="feedback") 
