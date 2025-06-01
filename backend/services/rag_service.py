@@ -11,7 +11,8 @@ class RAGService:
     def __init__(self):
         self.llm = OpenAI(
             api_key=os.getenv("OPENAI_API_KEY"),
-            temperature=0.7
+            temperature=0.7,
+            max_tokens=150  # Limit token usage
         )
         self.embeddings = OpenAIEmbeddings(
             api_key=os.getenv("OPENAI_API_KEY")
@@ -60,9 +61,9 @@ class RAGService:
         # Convert questions and responses into documents for the vector store
         documents = []
         
-        # Process all question types
+        # Process all question types (limit to 100 questions for free tier)
         for q_type, questions in self.questions.items():
-            for q in questions:
+            for q in questions[:100]:  # Limit number of questions
                 doc = {
                     "content": f"Question Type: {q_type}\nQuestion: {q['question']}\nAnswer: {q['answer']}\nDifficulty: {q['difficulty']}\nFeedback: {q['feedback']}",
                     "metadata": {
@@ -74,10 +75,10 @@ class RAGService:
                 }
                 documents.append(doc)
         
-        # Create text splitter
+        # Create text splitter with smaller chunks
         text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=1000,
-            chunk_overlap=200
+            chunk_size=500,  # Smaller chunks
+            chunk_overlap=50  # Less overlap
         )
         
         # Split documents

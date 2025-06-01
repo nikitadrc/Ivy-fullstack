@@ -17,9 +17,7 @@ services:
       - key: PYTHON_VERSION
         value: 3.9.0
       - key: DATABASE_URL
-        fromDatabase:
-          name: interview-db
-          property: connectionString
+        value: sqlite:///./interview_chatbot.db
       - key: OPENAI_API_KEY
         sync: false
       - key: JWT_SECRET
